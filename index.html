@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Logical Expressions Simulator</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    #expression-container {
+      text-align: center;
+      padding: 20px;
+      border: 1px solid #dee2e6;
+      border-radius: 5px;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    #expression {
+      font-size: 24px;
+      margin-bottom: 10px;
+      user-select: none; /* Prevent text selection */
+    }
+
+    #level {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    #score {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    #check-button {
+      font-size: 18px;
+    }
+
+    #question-mark {
+      cursor: pointer;
+      color: blue;
+    }
+
+    #score-bar {
+      height: 20px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    #score-fill {
+      height: 100%;
+      background-color: #28a745; /* Green color for the fill */
+      transition: width 0.3s ease-in-out;
+      width: 0%; /* Initialize to 0% */
+    }
+  </style>
+</head>
+<body>
+
+<div id="expression-container">
+  <div id="expression"></div>
+  <div id="level"></div>
+  <div id="score"></div>
+  <div id="score-bar">
+    <div id="score-fill"></div>
+  </div>
+  <button id="check-button" class="btn btn-primary" onclick="checkAnswer()">Check</button>
+</div>
+
+<script>
+  const levels = [
+    ['1',	'0',	'!0',	'!0',	'!!0',	'!1',	'!!1',	'!1'], 
+    ['0 × 0',	'!0 × 0',	'0 × !0',	'0 × 1',	'!0 × 1',	'0 × !1',	'1 × 0',	'!1 × 0',	'1 × !0',	'1 × 1',	'1 × !1',	'!1 × 1',	'!0 × !0',	'!1 × !1'],
+    ['0 × 0 × 0',	'!0 × 0 × !0',	'0 × !0 × 0',	'!0 × !0 × !0',	'0 × 0 × 1',	'!0 × 0 × 1',	'!0 × !0 × 1',	'!0 × !0 × !1',	'0 × 1 × 0',	'!0 × 1 × !0',	'0 × 1 × !0',	'!0 × 1 × 0',	'0 × 1 × 1',	'!0 × 1 × 1',	'0 × 1 × !1',	'0 × !1 × 1',	'1 × 0 × 0',	'1 × !0 × !0',	'!1 × 0 × 0',	'1 × 0 × !0',	'1 × 0 × 1',	'1 × !0 × 1',	'1 × 0 × !1',	'!1 × !0 × 1',	'1 × 1 × 0',	'1 × 1 × !0',	'1 × !1 × 0',	'!1 × 1 × !0',	'1 × 1 × 1',	'!1 × 1 × 1',	'1 × 1 × !1',	'1 × !1 × 1'],
+    ['0 + 0',	'0 + !0',	'!0 + 0',	'!0 + !0',	'1 + 0',	'1 + !0',	'!1 + 0',	'!1 + !0',	'0 + 1',	'0 + !1',	'!0 + 1',	'!0 + !1',	'1 + 1',	'1 + !1',	'!1 + 1',	'!1 + !1'],
+    ['0 + 0 + 0',	'0 + 0 + !0',	'0 + !0 + 0',	'!0 + 0 + 0',	'0 + 0 + 1',	'0 + 0 + !1',	'0 + !0 + !1',	'!0 + !0 + !1',	'0 + 1 + 0',	'0 + !1 + 0',	'0 + !1 + !0',	'!0 + !1 + !0',	'0 + 1 + 1',	'0 + !1 + !1',	'0 + !1 + 1',	'!0 + 1 + !1',	'1 + 0 + 0',	'!1 + 0 + 0',	'!1 + 0 + !0',	'!1 + !0 + 0',	'1 + 0 + 1',	'!1 + 0 + !1',	'!1 + 0 + 1',	'1 + 0 + !1',	'1 + 1 + 0',	'!1 + !1 + 0',	'!1 + 1 + 0',	'1 + !1 + 0',	'1 + 1 + 1',	'!1 + !1 + !1',	'!1 + !1 + 1',	'!1 + 1 + !1'],
+    ['0 × 0 × 0',	'!0 × 0 × !0',	'!0 × !0 × !0',	'0 × 0 × 1',	'!0 × !0 × 1',	'!0 × !0 × !1',	'0 × 1 × 0',	'!0 × 1 × !0',	'!0 × 1 × 0',	'0 × 1 × 1',	'!0 × 1 × 1',	'!0 × 1 × !1',	'1 × 0 × 0',	'1 × !0 × !0',	'!1 × !0 × 0',	'1 × 0 × 1',	'1 × !0 × 1',	'!1 × !0 × 1',	'1 × 1 × 0',	'1 × 1 × !0',	'!1 × 1 × !0',	'1 × 1 × 1',	'!1 × 1 × 1',	'1 × 1 × !1',	'!0 × 0 × !0',	'0 × !0 × 0',	'!0 × !0 × !0',	'!0 × 0 × 1',	'!0 × !0 × 1',	'!0 × !0 × !1',	'0 × 1 × 0',	'!0 × 1 × !0',	'!0 × 1 × 0',	'0 × 1 × 1',	'!0 × 1 × 1',	'0 × 1 × !1',	'1 × 0 × 0',	'1 × !0 × !0',	'1 × 0 × !0',	'1 × 0 × 1',	'1 × !0 × 1',	'!1 × !0 × 1',	'1 × 1 × 0',	'1 × 1 × !0',	'!1 × 1 × !0',	'1 × 1 × 1',	'!1 × 1 × 1',	'1 × 1 × !1',	'0 × 0 + 0',	'0 × 0 + !0',	'!0 × !0 + 0',	'!0 × 0 + 0',	'0 × !0 + !0',	'0 × !0 + 0',	'0 × 0 + 1',	'!0 × !0 + !1',	'0 × !0 + 1',	'0 × !0 + !1',	'!0 × 0 + !1',	'0 × 0 + !1',	'0 × 1 + 0',	'0 × !1 + 0',	'!0 × !1 + 0',	'!0 × 1 + 0',	'0 × 1 + !0',	'0 × !1 + !0',	'0 × 1 + 1',	'0 × !1 + 1',	'!0 × 1 + !1',	'0 × 1 + !1',	'0 × !1 + !1',	'!0 × !1 + !1',	'1 × 0 + 0',	'!1 × 0 + 0',	'!1 × !0 + 0',	'1 × 0 + !0',	'1 × !0 + 0',	'!1 × 0 + !0',	'1 × 0 + 1',	'!1 × 0 + 1',	'1 × !0 + !1',	'1 × 0 + !1',	'!1 × !0 + !1',	'!1 × 0 + !1',	'1 × 1 + 0',	'1 × !1 + !0',	'!1 × !1 + !0',	'1 × !1 + 0',	'!1 × 1 + 0',	'!1 × !1 + 0',	'1 × 1 + 1',	'1 × 1 + !1',	'!1 × 1 + 1',	'1 × !1 + !1',	'!1 × 1 + !1',	'!1 × !1 + !1',	'0 + 0 × 0',	'!0 + 0 × 0',	'0 + !0 × !0',	'0 + !0 × 0',	'!0 + 0 × !0',	'0 + 0 × !0',	'1 + 0 × 0',	'!1 + !0 × !0',	'1 + 0 × !0',	'!1 + 0 × !0',	'!1 + !0 × 0',	'!1 + 0 × 0',	'0 + 0 × 1',	'0 + 0 × !1',	'0 + !0 × !1',	'0 + !0 × 1',	'!0 + 0 × 1',	'!0 + 0 × !1',	'1 + 0 × 1',	'1 + 0 × !1',	'!1 + !0 × 1',	'!1 + 0 × 1',	'!1 + 0 × !1',	'!1 + !0 × !1',	'0 + 1 × 0',	'0 + !1 × 0',	'0 + !1 × !0',	'!0 + 1 × 0',	'0 + 1 × !0',	'!0 + !1 × 0',	'1 + 1 × 0',	'1 + !1 × 0',	'!1 + 1 × !0',	'!1 + 1 × 0',	'!1 + !1 × !0',	'!1 + !1 × 0',	'0 + 1 × 1',	'!0 + 1 × !1',	'!0 + !1 × !1',	'0 + 1 × !1',	'0 + !1 × 1',	'0 + !1 × !1',	'1 + 1 × 1',	'!1 + 1 × 1',	'1 + !1 × 1',	'!1 + 1 × !1',	'!1 + !1 × 1',	'!1 + !1 × !1'],
+    ['0 × 0 × 0',	'!0 × 0 × !0',	'!0 × !0 × !0',	'0 × 0 × 1',	'!0 × !0 × 1',	'!0 × !0 × !1',	'0 × 1 × 0',	'!0 × 1 × !0',	'!0 × 1 × 0',	'0 × 1 × 1',	'!0 × 1 × 1',	'!0 × 1 × !1',	'1 × 0 × 0',	'1 × !0 × !0',	'!1 × !0 × 0',	'1 × 0 × 1',	'1 × !0 × 1',	'!1 × !0 × 1',	'1 × 1 × 0',	'1 × 1 × !0',	'!1 × 1 × !0',	'1 × 1 × 1',	'!1 × 1 × 1',	'1 × 1 × !1',	'!0 × 0 × !0',	'0 × !0 × 0',	'!0 × !0 × !0',	'!0 × 0 × 1',	'!0 × !0 × 1',	'!0 × !0 × !1',	'0 × 1 × 0',	'!0 × 1 × !0',	'!0 × 1 × 0',	'0 × 1 × 1',	'!0 × 1 × 1',	'0 × 1 × !1',	'1 × 0 × 0',	'1 × !0 × !0',	'1 × 0 × !0',	'1 × 0 × 1',	'1 × !0 × 1',	'!1 × !0 × 1',	'1 × 1 × 0',	'1 × 1 × !0',	'!1 × 1 × !0',	'1 × 1 × 1',	'!1 × 1 × 1',	'1 × 1 × !1',	'0 × 0 + 0',	'0 × 0 + !0',	'!0 × !0 + 0',	'!0 × 0 + 0',	'0 × !0 + !0',	'0 × !0 + 0',	'0 × 0 + 1',	'!0 × !0 + !1',	'0 × !0 + 1',	'0 × !0 + !1',	'!0 × 0 + !1',	'0 × 0 + !1',	'0 × 1 + 0',	'0 × !1 + 0',	'!0 × !1 + 0',	'!0 × 1 + 0',	'0 × 1 + !0',	'0 × !1 + !0',	'0 × 1 + 1',	'0 × !1 + 1',	'!0 × 1 + !1',	'0 × 1 + !1',	'0 × !1 + !1',	'!0 × !1 + !1',	'1 × 0 + 0',	'!1 × 0 + 0',	'!1 × !0 + 0',	'1 × 0 + !0',	'1 × !0 + 0',	'!1 × 0 + !0',	'1 × 0 + 1',	'!1 × 0 + 1',	'1 × !0 + !1',	'1 × 0 + !1',	'!1 × !0 + !1',	'!1 × 0 + !1',	'1 × 1 + 0',	'1 × !1 + !0',	'!1 × !1 + !0',	'1 × !1 + 0',	'!1 × 1 + 0',	'!1 × !1 + 0',	'1 × 1 + 1',	'1 × 1 + !1',	'!1 × 1 + 1',	'1 × !1 + !1',	'!1 × 1 + !1',	'!1 × !1 + !1',	'0 + 0 × 0',	'!0 + 0 × 0',	'0 + !0 × !0',	'0 + !0 × 0',	'!0 + 0 × !0',	'0 + 0 × !0',	'1 + 0 × 0',	'!1 + !0 × !0',	'1 + 0 × !0',	'!1 + 0 × !0',	'!1 + !0 × 0',	'!1 + 0 × 0',	'0 + 0 × 1',	'0 + 0 × !1',	'0 + !0 × !1',	'0 + !0 × 1',	'!0 + 0 × 1',	'!0 + 0 × !1',	'1 + 0 × 1',	'1 + 0 × !1',	'!1 + !0 × 1',	'!1 + 0 × 1',	'!1 + 0 × !1',	'!1 + !0 × !1',	'0 + 1 × 0',	'0 + !1 × 0',	'0 + !1 × !0',	'!0 + 1 × 0',	'0 + 1 × !0',	'!0 + !1 × 0',	'1 + 1 × 0',	'1 + !1 × 0',	'!1 + 1 × !0',	'!1 + 1 × 0',	'!1 + !1 × !0',	'!1 + !1 × 0',	'0 + 1 × 1',	'!0 + 1 × !1',	'!0 + !1 × !1',	'0 + 1 × !1',	'0 + !1 × 1',	'0 + !1 × !1',	'1 + 1 × 1',	'!1 + 1 × 1',	'1 + !1 × 1',	'!1 + 1 × !1',	'!1 + !1 × 1',	'!1 + !1 × !1']
+  ];
+
+  let currentLevel = 1;
+  let clickCount = 0;
+  let score = 0;
+  let wrongAnswers = 0;
+
+  function generateNewExpression() {
+    clickCount++;
+
+    if (score % 5 == 0 && score != 0) {
+      // score = 0;
+      currentLevel++;
+      if (currentLevel > levels.length) {
+        alert("Good Job! You have finished all levels!");
+        currentLevel = 1;
+      }
+      document.getElementById('level').innerHTML = `Level ${currentLevel}`;
+    }
+
+    if (clickCount >= 5) {
+      clickCount = 0;
+    }
+
+    const expressions = levels[currentLevel - 1];
+    const randomIndex = Math.floor(Math.random() * expressions.length);
+    const selectedExpression = expressions[randomIndex];
+
+    document.getElementById('expression').innerHTML = `${selectedExpression} = <span id="question-mark" onclick="startToggle()">?</span>`;
+    document.getElementById('score').innerHTML = `Score: ${score}`;
+  }
+
+  function startToggle() {
+    const questionMark = document.getElementById('question-mark');
+    questionMark.textContent = '0'; // Initialize to 0
+    questionMark.onclick = function() {
+      toggleAnswer();
+    };
+  }
+
+  function toggleAnswer() {
+    const questionMark = document.getElementById('question-mark');
+    const currentAnswer = questionMark.textContent;
+
+    if (currentAnswer === '0') {
+      questionMark.textContent = '1';
+    } else if (currentAnswer === '1') {
+      questionMark.textContent = '0';
+    }
+  }
+
+  function checkAnswer() {
+    const expressionText = document.getElementById('expression').innerText.split('=')[0].trim();
+    const questionMark = document.getElementById('question-mark');
+    const userAnswer = questionMark.textContent;
+    
+    // Use your expression evaluation script here
+    let convertedExpression = [];
+    for (let i = 0; i < expressionText.length; i++) {
+      if (expressionText[i] === "1") {
+        convertedExpression.push("1");
+      } else if (expressionText[i] === "0") {
+        convertedExpression.push("0");
+      } else if (expressionText[i] === "!") {
+        convertedExpression.push("!");
+      } else if (expressionText[i] === "×" || expressionText[i] === "*") {
+        convertedExpression.push("&&");
+      } else if (expressionText[i] === "+") {
+        convertedExpression.push("||");
+      } else {
+        convertedExpression.push(expressionText[i]);
+      }
+    }
+    let jsLogicalExpression = convertedExpression.join("");
+    let correctAnswer = eval(jsLogicalExpression);
+
+    if (userAnswer === String(+correctAnswer)) {
+      score++;
+      wrongAnswers = 0; // Reset wrong answers counter for correct answers
+    } else {
+      score -= 2; // Wrong answer deducts 2 points
+      wrongAnswers++;
+    }
+
+    // Display the updated score
+    document.getElementById('score').innerHTML = `Score: ${score}`;
+
+    // Update the score bar
+    const scoreBar = document.getElementById('score-bar');
+    const scoreFill = document.getElementById('score-fill');
+    const percentage = (score / 5) * 100;
+    scoreFill.style.width = `${Math.min(100, percentage)}%`;
+
+    // Check if user needs to drop down two levels
+    if (wrongAnswers === 3) {
+      currentLevel = Math.max(1, currentLevel - 2);
+      score = 0; // Reset score when the level is lowered
+      document.getElementById('level').innerHTML = `Level ${currentLevel}`;
+      wrongAnswers = 0; // Reset wrong answers counter after dropping down
+    }
+
+    // Generate a new expression after checking the answer
+    generateNewExpression();
+  }
+
+  // Initial expression setup when the page loads
+  generateNewExpression();
+</script>
+
+</body>
+</html>
