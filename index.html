@@ -91,14 +91,16 @@
   let currentLevel = 1;
   let clickCount = 0;
   let score = 0;
+  let totalScore = 0;
   let wrongAnswers = 0;
 
   function generateNewExpression() {
     clickCount++;
 
     if (score % 5 == 0 && score != 0) {
-      // score = 0;
+      score = 0;
       currentLevel++;
+      document.getElementById('score-fill').style.width = '0%'; // Reset the score bar to empty
       if (currentLevel > levels.length) {
         alert("Good Job! You have finished all levels!");
         currentLevel = 1;
@@ -115,7 +117,7 @@
     const selectedExpression = expressions[randomIndex];
 
     document.getElementById('expression').innerHTML = `${selectedExpression} = <span id="question-mark" onclick="startToggle()">?</span>`;
-    document.getElementById('score').innerHTML = `Score: ${score}`;
+    document.getElementById('score').innerHTML = `Score: ${totalScore}`;
   }
 
   function startToggle() {
@@ -164,14 +166,16 @@
 
     if (userAnswer === String(+correctAnswer)) {
       score++;
+      totalScore++;
       wrongAnswers = 0; // Reset wrong answers counter for correct answers
     } else {
-      score -= 2; // Wrong answer deducts 2 points
+      score -= 2;
+      totalScore -= 2; // Wrong answer deducts 2 points
       wrongAnswers++;
     }
 
     // Display the updated score
-    document.getElementById('score').innerHTML = `Score: ${score}`;
+    document.getElementById('score').innerHTML = `Score: ${totalScore}`;
 
     // Update the score bar
     const scoreBar = document.getElementById('score-bar');
@@ -185,6 +189,7 @@
       score = 0; // Reset score when the level is lowered
       document.getElementById('level').innerHTML = `Level ${currentLevel}`;
       wrongAnswers = 0; // Reset wrong answers counter after dropping down
+      document.getElementById('score-fill').style.width = '0%'; // Reset the score bar to empty
     }
 
     // Generate a new expression after checking the answer
