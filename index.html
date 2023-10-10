@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Logical Expressions Simulator</title>
+  <title>Logical Expressions Trainer</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <style>
     body {
@@ -19,38 +19,37 @@
       text-align: center;
       padding: 20px;
       border: 1px solid #dee2e6;
-      border-radius: 5px;
+      border-radius: 10px;
       background-color: #fff;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      width: 400px;
     }
 
-    #expression {
-      font-size: 24px;
-      margin-bottom: 10px;
-      user-select: none; /* Prevent text selection */
+    .expression {
+      font-size: 35px;/* Adjust the font size as needed */
+      /* margin-bottom: 10px; */
+      user-select: none;/* Prevent text selection */
     }
 
-    #level {
+    #level,
+    #scores {
       font-size: 18px;
       margin-bottom: 10px;
-    }
-
-    #score {
-      font-size: 20px;
-      margin-bottom: 10px;
+      margin-top: 35px;
     }
 
     #check-button {
       font-size: 18px;
     }
 
-    #question-mark {
+    .question-mark {
       cursor: pointer;
       color: blue;
     }
 
     #score-bar {
-      height: 20px;
+      height: 20px;/* Adjust the height as needed */
+      width: 100%;/* Adjust the width as needed */
       border: 1px solid #ddd;
       border-radius: 5px;
       overflow: hidden;
@@ -68,9 +67,12 @@
 <body>
 
 <div id="expression-container">
-  <div id="expression"></div>
+  <div class="expression" id="expression1"></div>
+  <div class="expression" id="expression2"></div>
+  <div class="expression" id="expression3"></div>
+
   <div id="level"></div>
-  <div id="score"></div>
+  <div id="scores"></div>
   <div id="score-bar">
     <div id="score-fill"></div>
   </div>
@@ -78,7 +80,7 @@
 </div>
 
 <script>
-  const levels = [
+   const levels = [
     ['1',	'0',	'!0',	'!0',	'!!0',	'!1',	'!!1',	'!1'], 
     ['0 × 0',	'!0 × 0',	'0 × !0',	'0 × 1',	'!0 × 1',	'0 × !1',	'1 × 0',	'!1 × 0',	'1 × !0',	'1 × 1',	'1 × !1',	'!1 × 1',	'!0 × !0',	'!1 × !1'],
     ['0 × 0 × 0',	'!0 × 0 × !0',	'0 × !0 × 0',	'!0 × !0 × !0',	'0 × 0 × 1',	'!0 × 0 × 1',	'!0 × !0 × 1',	'!0 × !0 × !1',	'0 × 1 × 0',	'!0 × 1 × !0',	'0 × 1 × !0',	'!0 × 1 × 0',	'0 × 1 × 1',	'!0 × 1 × 1',	'0 × 1 × !1',	'0 × !1 × 1',	'1 × 0 × 0',	'1 × !0 × !0',	'!1 × 0 × 0',	'1 × 0 × !0',	'1 × 0 × 1',	'1 × !0 × 1',	'1 × 0 × !1',	'!1 × !0 × 1',	'1 × 1 × 0',	'1 × 1 × !0',	'1 × !1 × 0',	'!1 × 1 × !0',	'1 × 1 × 1',	'!1 × 1 × 1',	'1 × 1 × !1',	'1 × !1 × 1'],
@@ -88,24 +90,35 @@
     ['0 × 0 × 0',	'!0 × 0 × !0',	'!0 × !0 × !0',	'0 × 0 × 1',	'!0 × !0 × 1',	'!0 × !0 × !1',	'0 × 1 × 0',	'!0 × 1 × !0',	'!0 × 1 × 0',	'0 × 1 × 1',	'!0 × 1 × 1',	'!0 × 1 × !1',	'1 × 0 × 0',	'1 × !0 × !0',	'!1 × !0 × 0',	'1 × 0 × 1',	'1 × !0 × 1',	'!1 × !0 × 1',	'1 × 1 × 0',	'1 × 1 × !0',	'!1 × 1 × !0',	'1 × 1 × 1',	'!1 × 1 × 1',	'1 × 1 × !1',	'!0 × 0 × !0',	'0 × !0 × 0',	'!0 × !0 × !0',	'!0 × 0 × 1',	'!0 × !0 × 1',	'!0 × !0 × !1',	'0 × 1 × 0',	'!0 × 1 × !0',	'!0 × 1 × 0',	'0 × 1 × 1',	'!0 × 1 × 1',	'0 × 1 × !1',	'1 × 0 × 0',	'1 × !0 × !0',	'1 × 0 × !0',	'1 × 0 × 1',	'1 × !0 × 1',	'!1 × !0 × 1',	'1 × 1 × 0',	'1 × 1 × !0',	'!1 × 1 × !0',	'1 × 1 × 1',	'!1 × 1 × 1',	'1 × 1 × !1',	'0 × 0 + 0',	'0 × 0 + !0',	'!0 × !0 + 0',	'!0 × 0 + 0',	'0 × !0 + !0',	'0 × !0 + 0',	'0 × 0 + 1',	'!0 × !0 + !1',	'0 × !0 + 1',	'0 × !0 + !1',	'!0 × 0 + !1',	'0 × 0 + !1',	'0 × 1 + 0',	'0 × !1 + 0',	'!0 × !1 + 0',	'!0 × 1 + 0',	'0 × 1 + !0',	'0 × !1 + !0',	'0 × 1 + 1',	'0 × !1 + 1',	'!0 × 1 + !1',	'0 × 1 + !1',	'0 × !1 + !1',	'!0 × !1 + !1',	'1 × 0 + 0',	'!1 × 0 + 0',	'!1 × !0 + 0',	'1 × 0 + !0',	'1 × !0 + 0',	'!1 × 0 + !0',	'1 × 0 + 1',	'!1 × 0 + 1',	'1 × !0 + !1',	'1 × 0 + !1',	'!1 × !0 + !1',	'!1 × 0 + !1',	'1 × 1 + 0',	'1 × !1 + !0',	'!1 × !1 + !0',	'1 × !1 + 0',	'!1 × 1 + 0',	'!1 × !1 + 0',	'1 × 1 + 1',	'1 × 1 + !1',	'!1 × 1 + 1',	'1 × !1 + !1',	'!1 × 1 + !1',	'!1 × !1 + !1',	'0 + 0 × 0',	'!0 + 0 × 0',	'0 + !0 × !0',	'0 + !0 × 0',	'!0 + 0 × !0',	'0 + 0 × !0',	'1 + 0 × 0',	'!1 + !0 × !0',	'1 + 0 × !0',	'!1 + 0 × !0',	'!1 + !0 × 0',	'!1 + 0 × 0',	'0 + 0 × 1',	'0 + 0 × !1',	'0 + !0 × !1',	'0 + !0 × 1',	'!0 + 0 × 1',	'!0 + 0 × !1',	'1 + 0 × 1',	'1 + 0 × !1',	'!1 + !0 × 1',	'!1 + 0 × 1',	'!1 + 0 × !1',	'!1 + !0 × !1',	'0 + 1 × 0',	'0 + !1 × 0',	'0 + !1 × !0',	'!0 + 1 × 0',	'0 + 1 × !0',	'!0 + !1 × 0',	'1 + 1 × 0',	'1 + !1 × 0',	'!1 + 1 × !0',	'!1 + 1 × 0',	'!1 + !1 × !0',	'!1 + !1 × 0',	'0 + 1 × 1',	'!0 + 1 × !1',	'!0 + !1 × !1',	'0 + 1 × !1',	'0 + !1 × 1',	'0 + !1 × !1',	'1 + 1 × 1',	'!1 + 1 × 1',	'1 + !1 × 1',	'!1 + 1 × !1',	'!1 + !1 × 1',	'!1 + !1 × !1']
   ];
 
-  let currentLevel = 1;
+  let currentLevel = 6;
   let clickCount = 0;
-  let score = 0;
-  let totalScore = 0;
-  let wrongAnswers = 0;
+  let localScore = 0;
+  let globalScore = 0;
+  let wrongAnswersInLevel = 0;
+  const scoresNeededForLevelUp = 5; // Replace 5 with the desired number of scores needed for level-up
+
+  // Initial setup when the page loads
+  generateNewExpression();
 
   function generateNewExpression() {
     clickCount++;
 
-    if (score % 5 == 0 && score != 0) {
-      score = 0;
-      currentLevel++;
-      document.getElementById('score-fill').style.width = '0%'; // Reset the score bar to empty
-      if (currentLevel > levels.length) {
-        alert("Good Job! You have finished all levels!");
-        currentLevel = 1;
-      }
-      document.getElementById('level').innerHTML = `Level ${currentLevel}`;
+    if (localScore >= scoresNeededForLevelUp) {
+      // Update the score bar to 100% before raising the level
+      updateScoreBar(100);
+      
+      setTimeout(() => {
+        localScore = 0;
+        currentLevel++;
+        wrongAnswersInLevel = 0; // Reset wrong answers counter for the new level
+        if (currentLevel > levels.length) {
+          currentLevel = 1;
+        }
+        document.getElementById('level').innerHTML = `Level ${currentLevel}`;
+        
+        // Generate a new expression after raising the level
+        generateNewExpression();
+      }, 700); // Delay for 0.7 seconds before raising the level
     }
 
     if (clickCount >= 5) {
@@ -113,15 +126,31 @@
     }
 
     const expressions = levels[currentLevel - 1];
-    const randomIndex = Math.floor(Math.random() * expressions.length);
-    const selectedExpression = expressions[randomIndex];
+    const randomIndexes = getRandomIndexes(expressions.length, 3);
+    for (let i = 0; i < 3; i++) {
+      const selectedExpression = expressions[randomIndexes[i]];
+      document.getElementById(`expression${i + 1}`).innerHTML = `${selectedExpression} = <span class="question-mark" onclick="startToggle(${i + 1})">?</span>`;
+    }
 
-    document.getElementById('expression').innerHTML = `${selectedExpression} = <span id="question-mark" onclick="startToggle()">?</span>`;
-    document.getElementById('score').innerHTML = `Score: ${totalScore}`;
+    document.getElementById('scores').innerHTML = `Scores: ${globalScore}`;
+
+    // Update the score bar
+    updateScoreBar((localScore / scoresNeededForLevelUp) * 100);
   }
 
-  function startToggle() {
-    const questionMark = document.getElementById('question-mark');
+  function getRandomIndexes(max, count) {
+    const indexes = [];
+    while (indexes.length < count) {
+      const index = Math.floor(Math.random() * max);
+      if (!indexes.includes(index)) {
+        indexes.push(index);
+      }
+    }
+    return indexes;
+  }
+
+  function startToggle(index) {
+    const questionMark = document.querySelector(`#expression${index} .question-mark`);
     questionMark.textContent = '0'; // Initialize to 0
     questionMark.onclick = function() {
       toggleAnswer();
@@ -129,7 +158,7 @@
   }
 
   function toggleAnswer() {
-    const questionMark = document.getElementById('question-mark');
+    const questionMark = document.querySelector('.question-mark');
     const currentAnswer = questionMark.textContent;
 
     if (currentAnswer === '0') {
@@ -139,9 +168,15 @@
     }
   }
 
+  function updateScoreBar(percentage) {
+    const scoreBar = document.getElementById('score-bar');
+    const scoreFill = document.getElementById('score-fill');
+    scoreFill.style.width = `${Math.min(100, percentage)}%`;
+  }
+
   function checkAnswer() {
-    const expressionText = document.getElementById('expression').innerText.split('=')[0].trim();
-    const questionMark = document.getElementById('question-mark');
+    const expressionText = document.querySelector('.expression').innerText.split('=')[0].trim();
+    const questionMark = document.querySelector('.question-mark');
     const userAnswer = questionMark.textContent;
     
     // Use your expression evaluation script here
@@ -165,40 +200,34 @@
     let correctAnswer = eval(jsLogicalExpression);
 
     if (userAnswer === String(+correctAnswer)) {
-      score++;
-      totalScore++;
-      wrongAnswers = 0; // Reset wrong answers counter for correct answers
+      localScore++;
+      globalScore++;
     } else {
-      score -= 2;
-      totalScore -= 2; // Wrong answer deducts 2 points
-      wrongAnswers++;
+      localScore -= 2; // Wrong answer deducts 2 points
+      globalScore -= 2; // Deduct global score on wrong answer
+      localScore = Math.max(0, localScore); // Ensure local score doesn't go below 0
     }
 
-    // Display the updated score
-    document.getElementById('score').innerHTML = `Score: ${totalScore}`;
+    // Display the updated global score
+    document.getElementById('scores').innerHTML = `Scores: ${globalScore}`;
 
-    // Update the score bar
-    const scoreBar = document.getElementById('score-bar');
-    const scoreFill = document.getElementById('score-fill');
-    const percentage = (score / 5) * 100;
-    scoreFill.style.width = `${Math.min(100, percentage)}%`;
-
-    // Check if user needs to drop down two levels
-    if (wrongAnswers === 3) {
+    // Check if the user needs to drop down two levels
+    if (wrongAnswersInLevel === 3) {
       currentLevel = Math.max(1, currentLevel - 2);
-      score = 0; // Reset score when the level is lowered
+      localScore = 0; // Reset local score when the level is lowered
       document.getElementById('level').innerHTML = `Level ${currentLevel}`;
-      wrongAnswers = 0; // Reset wrong answers counter after dropping down
-      document.getElementById('score-fill').style.width = '0%'; // Reset the score bar to empty
+      wrongAnswersInLevel = 0; // Reset wrong answers counter after dropping down
     }
 
     // Generate a new expression after checking the answer
     generateNewExpression();
   }
-
-  // Initial expression setup when the page loads
-  generateNewExpression();
 </script>
 
 </body>
 </html>
+
+
+
+
+
