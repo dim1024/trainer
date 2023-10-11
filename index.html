@@ -103,7 +103,7 @@
   let localScore = 0;
   let globalScore = 0;
   let wrongAnswersInLevel = 0;
-  const scoresNeededForLevelUp = 2;
+  const scoresNeededForLevelUp = 5;
 
   function generateRandomExpression() {
     let variables = [];
@@ -287,6 +287,7 @@
         currentLevel++;
         wrongAnswersInLevel = 0;        
         if (currentLevel > levels.length) {
+          alert("Good Job! You have finished all levels!");
           currentLevel = 1;
         }
 
