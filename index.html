@@ -196,7 +196,7 @@
       }
     }
     
-    document.getElementById('level').innerHTML = `Level: ${currentLevel}`; // Display the current level immediately on first load
+    document.getElementById('level').innerHTML = `Level: ${currentLevel}/${levels.length}`; // Display the current level immediately on first load
 
     for (let i = 0; i < expressions.length; i++) {
       const selectedExpression = expressions[i];
